@@ -10,17 +10,68 @@ import UIKit
 
 @IBDesignable
 class FaceView: UIView {
+    // Public API
+    @IBInspectable
+    var scale : CGFloat = 0.9{
+        didSet{
+            setNeedsDisplay()
+        }
+    }
     
     @IBInspectable
-    var scale : CGFloat = 0.9
+    var eyesOpen : Bool = true{
+        didSet{
+            setNeedsDisplay()
+        }
+    }
+
     
     @IBInspectable
-    var eyesOpen : Bool = true
+    var mouthCurvature: Double = 1.0{ //full smile 1.0 and -1.0 is full frown
+        didSet{
+            setNeedsDisplay()
+        }
+    }
     
     @IBInspectable
-    var mouthCurvature: Double = 1.0 //full smile 1.0 and -1.0 is full frown
+    var color : UIColor = UIColor.blue{
+        didSet{
+            setNeedsDisplay()
+        }
+    }
+
     
-    @IBInspectable var lineWidth : CGFloat = 5.0
+    @IBInspectable var lineWidth : CGFloat = 5.0{
+        didSet{
+            setNeedsDisplay()
+        }
+    }
+
+    
+    
+    func changeScale(byRecatingTo pinchRecognizer: UIPinchGestureRecognizer)
+    {
+        switch pinchRecognizer.state{
+        case .changed, .ended:
+            scale *= pinchRecognizer.scale
+            pinchRecognizer.scale = 1
+        default:
+            break
+        }
+    }
+    
+    // End API
+    
+    
+    // Private implementation
+    private struct Ratios{
+        static let skullRadiusToEyeOffset: CGFloat = 3
+        static let skullRadiusToEyeRadius: CGFloat = 10
+        static let skullRadiusToEyeMonthWidth: CGFloat = 1
+        static let skullRadiusToEyeMonthHeight: CGFloat = 3
+        static let skullRadiusToEyeMouthOffset: CGFloat = 3
+        
+    }
     
     private var skullRadius : CGFloat  {
         return min(bounds.size.width, bounds.size.height) / 2 * scale
@@ -104,7 +155,7 @@ class FaceView: UIView {
     }
     
     override func draw(_ rect: CGRect) {
-        UIColor.blue.set()
+        color.set()
         
         pathForSkull().stroke()
         pathForEye(.left).stroke()
@@ -112,12 +163,5 @@ class FaceView: UIView {
         pathForMouth().stroke()
     }
     
-    private struct Ratios{
-        static let skullRadiusToEyeOffset: CGFloat = 3
-        static let skullRadiusToEyeRadius: CGFloat = 10
-        static let skullRadiusToEyeMonthWidth: CGFloat = 1
-        static let skullRadiusToEyeMonthHeight: CGFloat = 3
-        static let skullRadiusToEyeMouthOffset: CGFloat = 3
-        
-    }
+    
 }
